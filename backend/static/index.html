@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ThermalOps — Live Portfolio</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#0E1218; --surface:#161C25; --surface-2:#1D2530; --border:#2A3341; --border-soft:#232B37;
+    --text:#EAEEF3; --text-dim:#8C99AB; --text-faint:#5C6879;
+    --heat:#FF5A36; --heat-soft:#FF5A3622; --amber:#FFB238; --amber-soft:#FFB23822;
+    --cool:#17B9A8; --cool-soft:#17B9A822; --cool-2:#7EE8DC;
+    --gradient-thermal: linear-gradient(90deg, var(--cool) 0%, var(--amber) 55%, var(--heat) 100%);
+  }
+  *{box-sizing:border-box; margin:0; padding:0;}
+  body{background:var(--bg); color:var(--text); font-family:'Inter',sans-serif; padding:32px; -webkit-font-smoothing:antialiased;}
+  h1,h2,h3{font-family:'Space Grotesk',sans-serif; font-weight:600;}
+  .mono{font-family:'JetBrains Mono',monospace;}
+  .wrap{max-width:1180px; margin:0 auto;}
+  header{display:flex; justify-content:space-between; align-items:center; margin-bottom:28px; flex-wrap:wrap; gap:14px;}
+  .brand{display:flex; align-items:center; gap:10px; font-size:20px; font-weight:700;}
+  .brand .mark{width:26px; height:26px; border-radius:7px; background:var(--gradient-thermal); position:relative;}
+  .brand .mark::after{content:''; position:absolute; inset:5px; border-radius:3px; background:var(--bg);}
+  .mode-pill{font-family:'JetBrains Mono'; font-size:11px; padding:5px 12px; border-radius:20px; font-weight:700; letter-spacing:.04em; border:1px solid var(--border);}
+  .mode-live{background:var(--cool-soft); color:var(--cool-2); border-color:var(--cool);}
+  .mode-mock{background:var(--amber-soft); color:var(--amber); border-color:var(--amber);}
+  .refresh-btn{font-family:'JetBrains Mono'; font-size:12px; padding:8px 14px; border-radius:8px; background:var(--surface); border:1px solid var(--border); color:var(--text-dim); cursor:pointer;}
+  .refresh-btn:hover{color:var(--text); border-color:var(--text-faint);}
+
+  .kpi-row{display:grid; grid-template-columns:repeat(4,1fr); gap:14px; margin-bottom:26px;}
+  .kpi{background:var(--surface); border:1px solid var(--border); border-radius:12px; padding:16px 18px;}
+  .kpi .l{font-size:11px; color:var(--text-faint); text-transform:uppercase; letter-spacing:.05em; margin-bottom:8px;}
+  .kpi .v{font-family:'JetBrains Mono'; font-size:26px; font-weight:700;}
+  .v.heat{color:var(--heat);} .v.amber{color:var(--amber);} .v.cool{color:var(--cool-2);}
+
+  .grid2{display:grid; grid-template-columns:2fr 1fr; gap:20px; align-items:start;}
+  .panel{background:var(--surface); border:1px solid var(--border); border-radius:14px; padding:20px;}
+  .panel h2{font-size:15px; margin-bottom:14px;}
+  .vertical-block{margin-bottom:22px;}
+  .vertical-block:last-child{margin-bottom:0;}
+  .vertical-block .vt{font-size:12px; color:var(--cool-2); text-transform:uppercase; letter-spacing:.05em; margin-bottom:8px; font-weight:700;}
+
+  table{width:100%; border-collapse:collapse; font-size:13px;}
+  th{text-align:left; color:var(--text-faint); font-weight:500; font-size:10.5px; text-transform:uppercase; letter-spacing:.04em; padding:8px 10px; border-bottom:1px solid var(--border-soft);}
+  td{padding:10px; border-bottom:1px solid var(--border-soft); color:var(--text-dim);}
+  td.name{color:var(--text); font-weight:500;}
+  .badge{font-family:'JetBrains Mono'; font-size:10.5px; padding:3px 9px; border-radius:5px; font-weight:700;}
+  .badge-CRITICAL{background:var(--heat-soft); color:var(--heat);}
+  .badge-WARNING{background:var(--amber-soft); color:var(--amber);}
+  .badge-NORMAL{background:var(--cool-soft); color:var(--cool-2);}
+  .badge-UNKNOWN{background:var(--surface-2); color:var(--text-faint);}
+
+  .alert-item{background:var(--surface-2); border:1px solid var(--border-soft); border-radius:9px; padding:11px 12px; margin-bottom:10px;}
+  .alert-item .top{display:flex; justify-content:space-between; margin-bottom:6px; gap:8px;}
+  .alert-item .top .t{font-size:12.5px; font-weight:600;}
+  .alert-item .top .ts{font-family:'JetBrains Mono'; font-size:10px; color:var(--text-faint); white-space:nowrap;}
+  .alert-item .msg{font-size:11.5px; color:var(--text-dim); line-height:1.4;}
+  .empty{color:var(--text-faint); font-size:12.5px; padding:10px 0;}
+
+  footer{margin-top:26px; font-size:11.5px; color:var(--text-faint); display:flex; justify-content:space-between; flex-wrap:wrap; gap:8px;}
+
+  @media (max-width:900px){ .kpi-row{grid-template-columns:repeat(2,1fr);} .grid2{grid-template-columns:1fr;} }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div class="brand"><span class="mark"></span> ThermalOps <span style="color:var(--text-faint); font-weight:400; font-size:14px;">/ live portfolio</span></div>
+    <div style="display:flex; align-items:center; gap:10px;">
+      <span id="modePill" class="mode-pill mode-mock">MOCK MODE</span>
+      <button class="refresh-btn" id="refreshBtn">↻ Refresh now</button>
+    </div>
+  </header>
+
+  <div class="kpi-row">
+    <div class="kpi"><div class="l">Sites critical</div><div class="v heat" id="kpiCrit">—</div></div>
+    <div class="kpi"><div class="l">Sites warning</div><div class="v amber" id="kpiWarn">—</div></div>
+    <div class="kpi"><div class="l">Avg heat index</div><div class="v" id="kpiAvg">—</div></div>
+    <div class="kpi"><div class="l">Sites tracked</div><div class="v cool" id="kpiTotal">—</div></div>
+  </div>
+
+  <div class="grid2">
+    <div class="panel">
+      <h2>Portfolio — by vertical</h2>
+      <div id="verticalContainer"><div class="empty">Loading live data…</div></div>
+    </div>
+    <div class="panel">
+      <h2>Alert feed</h2>
+      <div id="alertContainer"><div class="empty">No alerts yet.</div></div>
+    </div>
+  </div>
+
+  <footer>
+    <span id="lastUpdated">—</span>
+    <span>Data source: FortyGuard Temperature API · <a href="/health" style="color:var(--text-dim);">health check</a></span>
+  </footer>
+</div>
+
+<script>
+const fmt = (n, d=1) => (n === null || n === undefined) ? '—' : Number(n).toFixed(d);
+
+async function loadPortfolio() {
+  const res = await fetch('/api/portfolio');
+  const data = await res.json();
+
+  document.getElementById('kpiCrit').textContent = data.summary.sites_critical;
+  document.getElementById('kpiWarn').textContent = data.summary.sites_warning;
+  document.getElementById('kpiAvg').textContent = fmt(data.summary.avg_heat_index) + '°C';
+  document.getElementById('kpiTotal').textContent = data.sites.length;
+
+  const pill = document.getElementById('modePill');
+  if (data.summary.mode === 'live') {
+    pill.textContent = 'LIVE — FortyGuard API';
+    pill.className = 'mode-pill mode-live';
+  } else {
+    pill.textContent = 'MOCK MODE — set FORTYGUARD_API_KEY for live data';
+    pill.className = 'mode-pill mode-mock';
+  }
+
+  const container = document.getElementById('verticalContainer');
+  container.innerHTML = '';
+  const labels = { workforce: 'Workforce Safety', logistics: 'Logistics & Cold Chain', data_center: 'Data Centers & Facilities' };
+  for (const [key, block] of Object.entries(data.by_vertical)) {
+    const div = document.createElement('div');
+    div.className = 'vertical-block';
+    const rows = block.sites.map(s => `
+      <tr>
+        <td class="name">${s.name}</td>
+        <td class="mono">${fmt(s.heat_index_c)}°C</td>
+        <td><span class="badge badge-${s.band}">${s.band}</span></td>
+        <td style="font-size:11.5px;">${s.action || '—'}</td>
+      </tr>`).join('');
+    div.innerHTML = `
+      <div class="vt">${block.label}</div>
+      <table>
+        <thead><tr><th>Site</th><th>Heat Index</th><th>Status</th><th>Action</th></tr></thead>
+        <tbody>${rows}</tbody>
+      </table>`;
+    container.appendChild(div);
+  }
+
+  document.getElementById('lastUpdated').textContent = 'Last updated: ' + new Date().toLocaleTimeString();
+}
+
+async function loadAlerts() {
+  const res = await fetch('/api/alerts');
+  const data = await res.json();
+  const container = document.getElementById('alertContainer');
+  if (!data.alerts.length) {
+    container.innerHTML = '<div class="empty">No threshold breaches yet.</div>';
+    return;
+  }
+  container.innerHTML = data.alerts.slice(0, 8).map(a => `
+    <div class="alert-item">
+      <div class="top">
+        <span class="t" style="color:${a.band === 'CRITICAL' ? 'var(--heat)' : 'var(--amber)'};">${a.site_name}</span>
+        <span class="ts">${new Date(a.timestamp).toLocaleTimeString()}</span>
+      </div>
+      <div class="msg">${a.message} (${fmt(a.heat_index_c)}°C)</div>
+    </div>`).join('');
+}
+
+async function refreshAll() {
+  await loadPortfolio();
+  await loadAlerts();
+}
+
+document.getElementById('refreshBtn').addEventListener('click', async () => {
+  await fetch('/api/refresh', { method: 'POST' });
+  await refreshAll();
+});
+
+refreshAll();
+setInterval(refreshAll, 30000);
+</script>
+</body>
+</html>
